@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "start": "node index.js"
-}
-
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -19,4 +17,4 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
-
+}
