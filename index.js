@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const credentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64;
-const credentialsPath = path.join(__dirname, "credentials.json");
+const credentialsPath = path.join(__dirname, "lead-hunter-461815-d981f88853c3.json");
 
 if (credentialsBase64 && !fs.existsSync(credentialsPath)) {
   fs.writeFileSync(
