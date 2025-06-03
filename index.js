@@ -1,3 +1,16 @@
+const fs = require("fs");
+const path = require("path");
+
+const credentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64;
+const credentialsPath = path.join(__dirname, "credentials.json");
+
+if (credentialsBase64 && !fs.existsSync(credentialsPath)) {
+  fs.writeFileSync(
+    credentialsPath,
+    Buffer.from(credentialsBase64, "base64").toString("utf-8")
+  );
+}
+
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(StealthPlugin());
