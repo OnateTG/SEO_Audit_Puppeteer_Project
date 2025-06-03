@@ -5,6 +5,10 @@
   "main": "Index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+    "scripts": {
+  "start": "node index.js"
+}
+
   },
   "keywords": [],
   "author": "",
@@ -18,3 +22,4 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
+
