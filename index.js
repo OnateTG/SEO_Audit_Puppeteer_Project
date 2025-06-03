@@ -1,0 +1,84 @@
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
+
+const fs = require("fs");
+const path = require("path");
+const { google } = require("googleapis");
+const express = require("express");
+const bodyParser = require("body-parser");
+
+const app = express();
+app.use(bodyParser.json());
+
+app.post("/run-audit", async (req, res) => {
+  const { website, name, email } = req.body;
+
+  if (!website || !name || !email) {
+    return res.status(400).send("Missing required fields.");
+  }
+
+  const browser = await puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+
+  const page = await browser.newPage();
+
+  try {
+    await page.goto("https://YOUR-AUDIT-TOOL.com", {
+      waitUntil: "networkidle2",
+    });
+
+    await page.type('input[name="website"]', website);
+    await page.type('input[name="firstName"]', name);
+    await page.type('input[name="email"]', email);
+
+    await Promise.all([
+      page.click('button[type="submit"]'),
+      page.waitForNavigation({ waitUntil: "networkidle2" }),
+    ]);
+
+    const downloadUrl = await page.$eval("a.download-button", (el) => el.href);
+
+    const pdfPath = path.join(
+      __dirname,
+      `${website.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`
+    );
+    const viewSource = await page.goto(downloadUrl);
+    fs.writeFileSync(pdfPath, await viewSource.buffer());
+
+    const auth = new google.auth.GoogleAuth({
+      keyFile: "credentials.json",
+      scopes: ["https://www.googleapis.com/auth/drive.file"],
+    });
+
+    const drive = google.drive({ version: "v3", auth });
+    const fileMetadata = { name: path.basename(pdfPath) };
+    const media = {
+      mimeType: "application/pdf",
+      body: fs.createReadStream(pdfPath),
+    };
+
+    const uploadResponse = await drive.files.create({
+      resource: fileMetadata,
+      media,
+      fields: "id",
+    });
+
+    const fileId = uploadResponse.data.id;
+    const fileLink = `https://drive.google.com/file/d/${fileId}/view`;
+
+    await browser.close();
+    res.json({ auditLink: fileLink });
+  } catch (error) {
+    await browser.close();
+    console.error("Error generating audit:", error);
+    res.status(500).send("Failed to generate audit.");
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Audit bot running on port ${PORT}`);
+});
