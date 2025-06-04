@@ -14,8 +14,6 @@ if (credentialsBase64 && !fs.existsSync(credentialsPath)) {
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(StealthPlugin());
-
-const fs = require("fs");
 const path = require("path");
 const { google } = require("googleapis");
 const express = require("express");
