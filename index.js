@@ -29,6 +29,11 @@ app.post("/run-audit", async (req, res) => {
     return res.status(400).send("Missing required fields.");
   }
 
+  const downloadPath = path.join(__dirname, "downloads");
+  if (!fs.existsSync(downloadPath)) {
+    fs.mkdirSync(downloadPath);
+  }
+
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -37,6 +42,13 @@ app.post("/run-audit", async (req, res) => {
   const page = await browser.newPage();
 
   try {
+    // Enable file downloads to a local folder
+    const client = await page.target().createCDPSession();
+    await client.send("Page.setDownloadBehavior", {
+      behavior: "allow",
+      downloadPath: downloadPath,
+    });
+
     await page.goto("https://www.thehoth.com/seo-audit-tool/", {
       waitUntil: "networkidle2",
     });
@@ -50,17 +62,30 @@ app.post("/run-audit", async (req, res) => {
       page.waitForNavigation({ waitUntil: "networkidle2" }),
     ]);
 
-    const downloadUrl = await page.$eval("a.download-button", (el) => el.href);
+    // Wait for the PDF file to be downloaded
+    const waitForDownload = async () => {
+      const timeout = 90000; // 90 seconds
+      const start = Date.now();
+      let fileName;
 
-    const pdfPath = path.join(
-      __dirname,
-      `${website.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`
-    );
-    const viewSource = await page.goto(downloadUrl);
-    fs.writeFileSync(pdfPath, await viewSource.buffer());
+      while (Date.now() - start < timeout) {
+        const files = fs.readdirSync(downloadPath);
+        const pdfFiles = files.filter((f) => f.endsWith(".pdf"));
+        if (pdfFiles.length > 0) {
+          fileName = pdfFiles[0];
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+
+      if (!fileName) throw new Error("PDF download timed out.");
+      return path.join(downloadPath, fileName);
+    };
+
+    const pdfPath = await waitForDownload();
 
     const auth = new google.auth.GoogleAuth({
-      keyFile: "lead-hunter-461815-d981f88853c3.json",
+      keyFile: credentialsPath,
       scopes: ["https://www.googleapis.com/auth/drive.file"],
     });
 
