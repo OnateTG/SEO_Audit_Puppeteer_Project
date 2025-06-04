@@ -41,8 +41,8 @@ app.post("/run-audit", async (req, res) => {
       waitUntil: "networkidle2",
     });
 
-    await page.type('input[name="website"]', website);
-    await page.type('input[name="firstName"]', name);
+    await page.type('input[name="domain"]', website);
+    await page.type('input[name="first_name"]', name);
     await page.type('input[name="email"]', email);
 
     await Promise.all([
