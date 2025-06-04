@@ -37,7 +37,7 @@ app.post("/run-audit", async (req, res) => {
   const page = await browser.newPage();
 
   try {
-    await page.goto("https://www.thehoth.com/seo-audit-tool/?", {
+    await page.goto("https://www.thehoth.com/seo-audit-tool/", {
       waitUntil: "networkidle2",
     });
 
@@ -60,7 +60,7 @@ app.post("/run-audit", async (req, res) => {
     fs.writeFileSync(pdfPath, await viewSource.buffer());
 
     const auth = new google.auth.GoogleAuth({
-      keyFile: "credentials.json",
+      keyFile: "lead-hunter-461815-d981f88853c3.json",
       scopes: ["https://www.googleapis.com/auth/drive.file"],
     });
 
