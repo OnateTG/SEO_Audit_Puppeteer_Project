@@ -46,7 +46,7 @@ app.post("/run-audit", async (req, res) => {
     await page.type('input[name="email"]', email);
 
     await Promise.all([
-      page.click('input[type="submit" value="Run Report"]'),
+      page.click('input[type="submit"]'),
       page.waitForNavigation({ waitUntil: "networkidle2" }),
     ]);
 
