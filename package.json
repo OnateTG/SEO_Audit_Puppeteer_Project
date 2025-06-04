@@ -1,19 +1,27 @@
 {
   "name": "lead-hunter",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI agent for website audits using Puppeteer and Google Drive",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "puppeteer",
+    "seo",
+    "audit",
+    "google-drive",
+    "automation",
+    "render"
+  ],
+  "author": " ",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^2.2.0",
-    "express": "^5.1.0",
-    "googleapis": "^149.0.0",
-    "puppeteer": "^24.10.0",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "googleapis": "^137.0.0",
+    "puppeteer": "^22.12.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
