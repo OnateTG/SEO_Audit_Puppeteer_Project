@@ -37,7 +37,7 @@ app.post("/run-audit", async (req, res) => {
   const page = await browser.newPage();
 
   try {
-    await page.goto("https://YOUR-AUDIT-TOOL.com", {
+    await page.goto("https://www.thehoth.com/seo-audit-tool/?", {
       waitUntil: "networkidle2",
     });
 
